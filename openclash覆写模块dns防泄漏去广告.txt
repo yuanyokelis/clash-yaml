@@ -1,0 +1,449 @@
+ [YAML]
+ # =================================================================
+# =================================================================
+# =================================================================
+# OpenClash 高可用定制配置文件 (基于 Clash-Verge-Rev #2606)
+# =================================================================
+
+mixed-port: 7890
+allow-lan: true
+mode: rule
+log-level: error
+ipv6: false
+
+# 统一外部控制
+external-controller: '0.0.0.0:9090'
+
+# ==================== DNS 高可用防泄漏设置 ====================
+dns:
+  enable: true
+  ipv6: false
+  prefer-h3: false
+  respect-rules: true
+  use-system-hosts: false
+  cache-algorithm: arc
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  
+  fake-ip-filter:
+    - '+.lan'
+    - '+.local'
+    - '+.msftconnecttest.com'
+    - '+.msftncsi.com'
+    - 'localhost.ptlogin2.qq.com'
+    - 'localhost.sec.qq.com'
+    - 'localhost.work.weixin.qq.com'
+
+  # 默认 DNS，用于解析 DNS 服务器的域名
+  default-nameserver:
+    - 223.5.5.5
+    - 1.1.1.1
+
+  # 国外加密 DNS (Fake-IP 模式下主要请求这里)
+  nameserver:
+    - 'https://cloudflare-dns.com/dns-query'
+    - 'https://77.88.8.8/dns-query'
+    - 'https://8.8.4.4/dns-query#ecs=1.1.1.1/24&ecs-override=true'
+    - 'https://208.67.222.222/dns-query#ecs=1.1.1.1/24&ecs-override=true'
+    - 'https://9.9.9.9/dns-query'
+
+  # 代理服务器域名解析 DNS
+  proxy-server-nameserver:
+    - 'https://223.5.5.5/dns-query'
+    - 'https://doh.pub/dns-query'
+
+  # 直连域名解析 DNS
+  direct-nameserver:
+    - 'https://223.5.5.5/dns-query'
+    - 'https://doh.pub/dns-query'
+
+  # 地区分流：国内域名强制走国内常规 DNS
+  nameserver-policy:
+    'geosite:cn': ['https://223.5.5.5/dns-query', 'https://doh.pub/dns-query']
+
+
+# ==================== 策略组配置 ====================
+proxy-groups:
+  - name: 🔰 手动选择
+    type: select
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    proxies:
+      - ⚙️ 自动选择
+      - 🔗 全局直连
+      - ♻️ 延迟选优
+      - ♻️ 延迟选优(排除香港)
+      - 自动故障转移
+
+  - name: ⚙️ 自动选择
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    include-all: true
+
+  - name: 💸 ChatGPT-Gemini-XAI-Perplexity
+    type: select
+    proxies: 
+      - ⚙️ 自动选择
+      - 🔰 手动选择
+      - ♻️ 延迟选优(排除香港)
+      - 自动故障转移
+    include-all: true
+
+  - name: 💵 Claude
+    type: select
+    proxies: [♻️ 延迟选优(排除香港), ⚙️ 自动选择, 🔗 全局直连, 自动故障转移]
+    include-all: true
+
+  - name: Ⓜ️ 微软服务
+    type: select
+    proxies: [🔗 全局直连, ⚙️ 自动选择, 🔰 手动选择]
+    include-all: true
+
+  - name: 🍎 苹果服务
+    type: select
+    proxies: [🔗 全局直连, ⚙️ 自动选择, 🔰 手动选择]
+    include-all: true
+    
+  - name: Amazon
+    type: select
+    proxies: [🔗 全局直连, ⚙️ 自动选择, 🔰 手动选择]
+    include-all: true
+    
+  - name: Amazon-Seller
+    type: select
+    proxies: [🔗 全局直连, ⚙️ 自动选择, 🔰 手动选择]
+    include-all: true
+
+
+  - name: 📺 YouTube服务
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    proxies: [⚙️ 自动选择, 🔰 手动选择, ♻️ 延迟选优, ♻️ 延迟选优(排除香港), 自动故障转移]
+    include-all: true
+
+
+  - name: 📢 谷歌服务
+    type: select
+    proxies: [⚙️ 自动选择, 🔗 全局直连, 🔰 手动选择]
+    include-all: true
+
+  - name: 📲 电报消息
+    type: select
+    proxies: [⚙️ 自动选择, 🔰 手动选择]
+    include-all: true
+
+  - name: 🅿️ PikPak
+    type: select
+    proxies: [⚙️ 自动选择, 🔗 全局直连]
+    include-all: true
+
+  - name: 🪙 Bybit
+    type: select
+    proxies: [⚙️ 自动选择, 🔗 全局直连]
+    include-all: true
+
+  - name: 🥰 广告过滤
+    type: select
+    proxies: [REJECT, 🔗 全局直连]
+
+  - name: 🐟 漏网之鱼
+    type: select
+    proxies: [🔰 手动选择, ⚙️ 自动选择]
+
+  - name: 🔗 全局直连
+    type: select
+    proxies: [DIRECT]
+
+  - name: ♻️ 延迟选优
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    include-all: true
+
+  - name: ♻️ 延迟选优(排除香港)
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    include-all-providers: true
+
+   
+
+  - name: 自动故障转移
+    type: fallback
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    include-all: true
+
+
+# ==================== 远程规则集加载 ====================
+rule-providers:
+  reject:
+    type: http
+    behavior: domain
+    format: yaml
+    url: "https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt"
+    path: ./ruleset/loyalsoldier/reject.yaml
+    interval: 86400
+
+  icloud:
+    type: http
+    behavior: domain
+    format: yaml
+    url: "https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/icloud.txt"
+    path: ./ruleset/loyalsoldier/icloud.yaml
+    interval: 86400
+
+  apple:
+    type: http
+    behavior: domain
+    format: yaml
+    url: "https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/apple.txt"
+    path: ./ruleset/loyalsoldier/apple.yaml
+    interval: 86400
+
+  youtube:
+    type: http
+    behavior: classical
+    format: yaml
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/classical/youtube.yaml"
+    path: ./ruleset/MetaCubeX/youtube.yaml
+    interval: 86400
+
+  google:
+    type: http
+    behavior: domain
+    format: yaml
+    url: "https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/google.txt"
+    path: ./ruleset/loyalsoldier/google.yaml
+    interval: 86400
+
+  proxy:
+    type: http
+    behavior: domain
+    format: yaml
+    url: "https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt"
+    path: ./ruleset/loyalsoldier/proxy.yaml
+    interval: 86400
+
+  direct:
+    type: http
+    behavior: domain
+    format: yaml
+    url: "https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt"
+    path: ./ruleset/loyalsoldier/direct.yaml
+    interval: 86400
+
+  private:
+    type: http
+    behavior: domain
+    format: yaml
+    url: "https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt"
+    path: ./ruleset/loyalsoldier/private.yaml
+    interval: 86400
+
+  gfw:
+    type: http
+    behavior: domain
+    format: yaml
+    url: "https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt"
+    path: ./ruleset/loyalsoldier/gfw.yaml
+    interval: 86400
+
+  tld-not-cn:
+    type: http
+    behavior: domain
+    format: yaml
+    url: "https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/tld-not-cn.txt"
+    path: ./ruleset/loyalsoldier/tld-not-cn.yaml
+    interval: 86400
+
+  telegramcidr:
+    type: http
+    behavior: ipcidr
+    format: yaml
+    url: "https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt"
+    path: ./ruleset/loyalsoldier/telegramcidr.yaml
+    interval: 86400
+
+  cncidr:
+    type: http
+    behavior: ipcidr
+    format: yaml
+    url: "https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt"
+    path: ./ruleset/loyalsoldier/cncidr.yaml
+    interval: 86400
+
+  lancidr:
+    type: http
+    behavior: ipcidr
+    format: yaml
+    url: "https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt"
+    path: ./ruleset/loyalsoldier/lancidr.yaml
+    interval: 86400
+
+  applications:
+    type: http
+    behavior: classical
+    format: yaml
+    url: "https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt"
+    path: ./ruleset/loyalsoldier/applications.yaml
+    interval: 86400
+
+  openai:
+    type: http
+    behavior: classical
+    format: yaml
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/classical/openai.yaml"
+    path: ./ruleset/MetaCubeX/openai.yaml
+    interval: 86400
+
+  bybit:
+    type: http
+    behavior: classical
+    format: yaml
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/classical/bybit.yaml"
+    path: ./ruleset/MetaCubeX/bybit.yaml
+    interval: 86400
+
+  pikpak:
+    type: http
+    behavior: classical
+    format: yaml
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/classical/pikpak.yaml"
+    path: ./ruleset/MetaCubeX/pikpak.yaml
+    interval: 86400
+
+  anthropic:
+    type: http
+    behavior: classical
+    format: yaml
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/classical/anthropic.yaml"
+    path: ./ruleset/MetaCubeX/anthropic.yaml
+    interval: 86400
+
+  google-gemini:
+    type: http
+    behavior: classical
+    format: yaml
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/classical/google-gemini.yaml"
+    path: ./ruleset/MetaCubeX/google-gemini.yaml
+    interval: 86400
+
+  xai:
+    type: http
+    behavior: classical
+    format: yaml
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/classical/xai.yaml"
+    path: ./ruleset/MetaCubeX/xai.yaml
+    interval: 86400
+
+  perplexity:
+    type: http
+    behavior: classical
+    format: yaml
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/classical/perplexity.yaml"
+    path: ./ruleset/MetaCubeX/perplexity.yaml
+    interval: 86400
+
+  microsoft:
+    type: http
+    behavior: classical
+    format: yaml
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/classical/microsoft.yaml"
+    path: ./ruleset/MetaCubeX/microsoft.yaml
+    interval: 86400
+
+# ==================== 分流规则设置 ====================
+rules:
+  # ------ 额外自定义直连/代理规则 (可自定) ------
+  - PROCESS-NAME,steam.exe,🔗 全局直连
+  - DOMAIN-SUFFIX,immersivetranslate.com,🔰 手动选择
+  - DOMAIN-SUFFIX,googleapis.cn,🔰 手动选择
+  - DOMAIN-SUFFIX,gstatic.com,🔰 手动选择
+  - DOMAIN-SUFFIX,github.io,🔰 手动选择
+  - DOMAIN-SUFFIX,github.com,🔰 手动选择  
+
+  # ------ 独立 AI / 特定服务分流 ------
+  - RULE-SET,openai,💸 ChatGPT-Gemini-XAI-Perplexity
+  - RULE-SET,google-gemini,💸 ChatGPT-Gemini-XAI-Perplexity
+  - RULE-SET,xai,💸 ChatGPT-Gemini-XAI-Perplexity
+  - RULE-SET,perplexity,💸 ChatGPT-Gemini-XAI-Perplexity
+  - RULE-SET,anthropic,💵 Claude
+  - RULE-SET,pikpak,🅿️ PikPak
+  - RULE-SET,bybit,🪙 Bybit
+  
+    # Amazon 前台
+  - DOMAIN-SUFFIX,amazon.com,Amazon
+  - DOMAIN-SUFFIX,amazon.co.uk,Amazon
+  - DOMAIN-SUFFIX,amazon.de,Amazon
+  - DOMAIN-SUFFIX,amazon.co.jp,Amazon
+  - DOMAIN-SUFFIX,amazon.ca,Amazon
+  - DOMAIN-SUFFIX,amazon.com.au,Amazon
+  - DOMAIN-SUFFIX,amazon.ae,Amazon
+  - DOMAIN-SUFFIX,amazon.sg,Amazon
+  - DOMAIN-SUFFIX,amazon.nl,Amazon
+  - DOMAIN-SUFFIX,amazon.it,Amazon
+  - DOMAIN-SUFFIX,amazon.es,Amazon
+  - DOMAIN-SUFFIX,amazon.fr,Amazon
+
+  # Amazon 图片CDN
+  - DOMAIN-SUFFIX,media-amazon.com,Amazon
+  - DOMAIN-SUFFIX,ssl-images-amazon.com,Amazon
+  - DOMAIN-SUFFIX,images-amazon.com,Amazon
+
+  # AWS
+  - DOMAIN-SUFFIX,amazonaws.com,Amazon
+  - DOMAIN-SUFFIX,aws.amazon.com,Amazon
+
+  # 卖家后台
+  - DOMAIN-SUFFIX,sellercentral.amazon.com,Amazon-Seller
+  - DOMAIN-SUFFIX,sellercentral.amazon.co.uk,Amazon-Seller
+  - DOMAIN-SUFFIX,sellercentral.amazon.de,Amazon-Seller
+  - DOMAIN-SUFFIX,sellercentral.amazon.co.jp,Amazon-Seller
+
+  - DOMAIN-SUFFIX,sell.amazon.com,Amazon-Seller
+  - DOMAIN-SUFFIX,seller-forums.amazon.com,Amazon-Seller
+
+  # 广告后台
+  - DOMAIN-SUFFIX,advertising.amazon.com,Amazon-Seller
+
+  # Brand Registry
+  - DOMAIN-SUFFIX,brandregistry.amazon.com,Amazon-Seller
+
+  # ------ YouTube 独立分流（防突发大流量影响 Google 办公） ------
+  - RULE-SET,youtube,📺 YouTube服务  
+
+  # ------ 常规基础服务分流 ------
+  - RULE-SET,applications,🔗 全局直连
+  - RULE-SET,private,🔗 全局直连
+  - RULE-SET,reject,🥰 广告过滤
+  - RULE-SET,microsoft,Ⓜ️ 微软服务
+  - RULE-SET,icloud,🍎 苹果服务
+  - RULE-SET,apple,🍎 苹果服务
+  - RULE-SET,google,📢 谷歌服务
+  
+  # ------ 基础代理/GFW分流 ------
+  - RULE-SET,proxy,🔰 手动选择
+  - RULE-SET,gfw,🔰 手动选择
+  - RULE-SET,tld-not-cn,🔰 手动选择
+  
+  # ------ 国内直连分流 ------
+  - RULE-SET,direct,🔗 全局直连
+  - RULE-SET,lancidr,🔗 全局直连,no-resolve
+  - RULE-SET,cncidr,🔗 全局直连,no-resolve
+  
+  # ------ 基础设施地区分流 ------
+  - RULE-SET,telegramcidr,📲 电报消息,no-resolve
+  - GEOIP,LAN,🔗 全局直连,no-resolve
+  - GEOIP,CN,🔗 全局直连,no-resolve
+  
+  # ------ 兜底规则 ------
+  - MATCH,🐟 漏网之鱼
