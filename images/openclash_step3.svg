@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="260">
+  <rect width="100%" height="100%" fill="#f3fff6" />
+  <text x="30" y="48" font-size="20" font-family="Arial" fill="#111">OpenClash 导入（示意） — 步骤 3</text>
+  <text x="30" y="88" font-size="16" font-family="Arial" fill="#333">应用配置后，查看 OpenClash 日志，确认没有报错。</text>
+  <rect x="30" y="110" width="820" height="110" rx="6" fill="#ffffff" stroke="#dff6e8" />
+  <text x="48" y="142" font-size="14" font-family="Arial" fill="#555">示意：日志区域会显示加载结果与 DNS 配置状态。</text>
+  <text x="48" y="168" font-size="14" font-family="Arial" fill="#555">出现异常请回退并检查覆写是否和主配置冲突。</text>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="260">
+  <rect width="100%" height="100%" fill="#fff7f3" />
+  <text x="30" y="48" font-size="20" font-family="Arial" fill="#111">OpenClash 导入（示意） — 步骤 2</text>
+  <text x="30" y="88" font-size="16" font-family="Arial" fill="#333">进入配置管理或覆写配置（Custom Configuration）区域。</text>
+  <rect x="30" y="110" width="820" height="110" rx="6" fill="#ffffff" stroke="#f7d6d0" />
+  <text x="48" y="142" font-size="14" font-family="Arial" fill="#555">将本仓库的 openclash 样例内容粘贴到自定义配置框或上传文件。</text>
+  <text x="48" y="168" font-size="14" font-family="Arial" fill="#555">保存并点击“应用/Apply”。</text>
+</svg>

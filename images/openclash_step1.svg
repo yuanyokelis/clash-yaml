@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="260">
+  <rect width="100%" height="100%" fill="#f7f9fc" />
+  <text x="30" y="48" font-size="20" font-family="Arial" fill="#111">OpenClash 导入（示意） — 步骤 1</text>
+  <text x="30" y="88" font-size="16" font-family="Arial" fill="#333">打开路由器 LuCI 管理界面（例如 http://192.168.1.1）并登录。</text>
+  <rect x="30" y="110" width="820" height="110" rx="6" fill="#ffffff" stroke="#dbe6f7" />
+  <text x="48" y="142" font-size="14" font-family="Arial" fill="#555">示意：左侧菜单 → Services → OpenClash</text>
+  <text x="48" y="168" font-size="14" font-family="Arial" fill="#555">如果找不到，请确认已安装 OpenClash 插件。</text>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="260">
+  <rect width="100%" height="100%" fill="#f0f7ff" />
+  <text x="30" y="48" font-size="20" font-family="Arial" fill="#111">Clash Verge 导入（示意） — 步骤 2</text>
+  <text x="30" y="88" font-size="16" font-family="Arial" fill="#333">打开 Clash Verge → Profiles（配置）→ Import（导入）→ From file（从文件）。</text>
+  <rect x="30" y="110" width="820" height="110" rx="6" fill="#ffffff" stroke="#d6e9ff" />
+  <text x="48" y="142" font-size="14" font-family="Arial" fill="#555">选择手机中保存的 YAML 文件并导入。</text>
+  <text x="48" y="168" font-size="14" font-family="Arial" fill="#555">导入时如报错请使用 UTF-8 无 BOM 保存并重试。</text>
+</svg>
